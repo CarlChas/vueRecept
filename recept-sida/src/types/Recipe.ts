@@ -1,7 +1,7 @@
 export interface Recipe {
-    id: number
-    title: string
-    image: string
-    description: string
+    idMeal: number
+    strMeal: string
+    strMealThumb: string
+    strInstructions: string
   }
   

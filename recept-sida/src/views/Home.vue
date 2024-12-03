@@ -16,35 +16,44 @@
 
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted } from 'vue';
-import RecipeCard from '../components/RecipeCard.vue';
-import { fetchRecipes } from '../services/recipeService';
+import { defineComponent, ref, computed, onMounted } from 'vue'
+import RecipeCard from '../components/RecipeCard.vue'
+import { fetchRecipes } from '../services/recipeService'
 
 export default defineComponent({
     components: { RecipeCard },
     setup() {
-        const recipes = ref<Array<any>>([]);
-        const searchQuery = ref('');
-        const error = ref('');
+        const recipes = ref<Array<any>>([])
+        const searchQuery = ref('')
+        const error = ref('')
 
         const filteredRecipes = computed(() =>
             recipes.value.filter((recipe) =>
                 recipe.strMeal.toLowerCase().includes(searchQuery.value.toLowerCase())
             )
-        );
+        )
 
         const loadRecipes = async () => {
             try {
-                recipes.value = await fetchRecipes(searchQuery.value); // Hämta data baserat på sökning
+                recipes.value = await fetchRecipes(searchQuery.value) // Hämta data baserat på sökning
             } catch (err) {
-                error.value = 'Kunde inte ladda recept.';
-                console.error(err);
+                error.value = 'Kunde inte ladda recept.'
+                console.error(err)
             }
-        };
+        }
+
+        const addToFavorites = (recipe: any) => {
+            const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
+            const alreadyExists = favorites.some((fav: any) => fav.idMeal === recipe.idMeal)
+            if (!alreadyExists) {
+                favorites.push(recipe)
+                localStorage.setItem('favorites', JSON.stringify(favorites))
+            }
+        }
 
         onMounted(loadRecipes);
 
-        return { recipes, searchQuery, filteredRecipes, error, loadRecipes };
+        return { recipes, searchQuery, filteredRecipes, error, loadRecipes, addToFavorites  }
     },
-});
+})
 </script>
